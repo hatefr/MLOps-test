@@ -1,0 +1,25 @@
+# azure-pipelines.yml
+trigger:
+  - "*"
+
+pr:
+  branches:
+    include:
+      - master
+
+pool:
+  vmImage: "ubuntu-latest"
+
+steps:
+  - script: |
+      az acr login --name <registry-name>
+      docker pull <registry-name>/mlops-example:latest
+    displayName: "Docker Pull"
+
+  - script: |
+      kubectl apply -f kubernetes-deployment.yaml
+    displayName: "Kubernetes Deployment"
+
+  - script: |
+      kubectl rollout restart deployment/mlops-example-deployment
+    displayName: "Kubernetes Rolling Restart"
